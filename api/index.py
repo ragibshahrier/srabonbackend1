@@ -2,8 +2,14 @@ from flask import Flask, request
 from pymongo import MongoClient
 from datetime import datetime
 
+import os
+
+MONGO_URI = os.getenv("MONGO_URI")  # or whatever name you choose
+
+
 app = Flask(__name__)
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient(MONGO_URI)
+# client = MongoClient("mongodb://localhost:27017/")
 db = client.chatdb
 
 import hashlib
