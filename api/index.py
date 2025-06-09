@@ -352,7 +352,7 @@ def processData():
 
 @app.route("/", methods = ['GET'])
 def index():
-    return "<h1 align = \"center\">Ahis</h1>"
+    return "Ahis"
 
 
 if __name__ == "__main__":
