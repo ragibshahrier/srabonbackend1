@@ -157,7 +157,7 @@ def getData():
                 "creator": course["creator"],
                 "courseID": course["courseID"],
                 "name": course["name"],
-                "author_name": course["author_name"],
+                "author_name": course.get("author_name", ""),
                 "parent": course["parent"]
             })
         return {"courses": course_list}, 200
