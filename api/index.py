@@ -182,7 +182,7 @@ def getData():
                 "creator": course["creator"],
                 "courseID": course["courseID"],
                 "name": course["name"],
-                "author_name": course["author_name"],
+                "author_name": course.get("author_name", ""),
                 "parent": course["parent"]
             })
         return {"courses": course_list}, 200
@@ -199,7 +199,7 @@ def getData():
                 "creator": course2["creator"],
                 "courseID": course2["courseID"],
                 "name": course2["name"],
-                "author_name": course2["author_name"],
+                "author_name": course2.get("author_name", ""),
                 "parent": course2["parent"]
             }
             return {"course": course_data}, 200
