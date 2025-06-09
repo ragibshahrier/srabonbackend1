@@ -349,5 +349,11 @@ def processData():
             return {"error": "Course not found or not accessible"}, 404
         return {"status": "success"}, 200
 
+
+@app.route("/", methods = ['GET'])
+def index():
+    return "<h1 align = \"center\">Ahis</h1>"
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
