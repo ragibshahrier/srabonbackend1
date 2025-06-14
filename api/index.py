@@ -122,9 +122,15 @@ def receive_data():
             "Has_Viewed_Article" : 0,
             "Has_Viewed_Flash_Card" : 0,
             "Has_Completed_Course" : 0,
-        })  
-
-
+        })
+    elif mode == "courseprogress":
+        courseID = data["courseID"]
+        course_progress = data["course_progress"]
+        course = db.explorer.find_one({"courseID": courseID, "user_id": user_id})
+        if not course:
+            return {"error": "Course not found or not accessible"}, 403
+        db.explorer.update_one({"_id": course["_id"]}, {"$set": {"course_progress": course_progress}})
+        return {"status": "success"}, 200
 
 
 
@@ -284,6 +290,26 @@ def getData():
             return {"activity": activity}, 200
         else:
             return {"error": "Activity not found"}, 404
+    
+    elif mode == "coursegetprogress":
+        courseID = data["courseID"]
+        course = db.explorer.find_one({"courseID": courseID, "user_id": user_id})
+        if not course:
+            return {"error": "Course not found or not accessible"}, 403
+        
+        progress = course.get("course_progress", {})
+        
+        response_progress = {
+            "description_read": progress.get("description_read", 0),
+            "flashcards_read": progress.get("flashcards_read", 0),
+            "articles_read": progress.get("articles_read", 0),
+            "quiz_score": progress.get("quiz_score", 0),
+            "previous_answers": progress.get("previous_answers", ""),
+        }
+        return {"progress": response_progress}, 200
+
+
+
 
 @app.route("/process", methods = ['POST'])
 def processData():
