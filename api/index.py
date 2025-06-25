@@ -148,11 +148,12 @@ def getData():
     elif mode == "courseget":
         courses = db.explorer.find({"user_id": user_id})
         course_list = []
-
+        courseID_to_access_map = {}
         if not courses:
             return {"courses": []}, 200
         for course in courses:
             course_list.append(course["courseID"])
+            courseID_to_access_map[course["courseID"]] = course.get("is_public", False)
 
         course_list = list(set(course_list))
 
@@ -164,6 +165,7 @@ def getData():
                 "courseID": course["courseID"],
                 "name": course["name"],
                 "author_name": course.get("author_name", ""),
+                "access": courseID_to_access_map.get(course["courseID"], False),
                 "parent": course["parent"]
             })
         return {"courses": course_list}, 200
@@ -175,7 +177,7 @@ def getData():
 
         if not courses:
             print("No courses found for public explorer")
-            return {"courses": []}, 404
+            return {"courses": []}, 200
         for course in courses:
             course_list.append(course["courseID"])
         
@@ -307,6 +309,25 @@ def getData():
             "previous_answers": progress.get("previous_answers", ""),
         }
         return {"progress": response_progress}, 200
+
+    elif mode == "coursegetprogressall":
+        courses_cursor = db.explorer.find({"user_id": user_id})
+        courses = list(courses_cursor)
+        
+
+        course_progress_list = []
+
+        for course in courses:
+            progress = course.get("course_progress", {})
+            response_progress = {
+                "description_read": progress.get("description_read", 0),
+                "flashcards_read": progress.get("flashcards_read", 0),
+                "articles_read": progress.get("articles_read", 0),
+                "quiz_score": progress.get("quiz_score", 0),
+                "previous_answers": progress.get("previous_answers", ""),
+            }
+            course_progress_list.append(response_progress)
+        return {"course_progress_list": course_progress_list}, 200
 
 
 
