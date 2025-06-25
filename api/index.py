@@ -170,28 +170,22 @@ def getData():
             })
         return {"courses": course_list}, 200
     
-    
+
     elif mode == "coursegetexplorer":
-        courses = db.explorer.find({ "$and": [ {"user_id":{"$not": {"$eq": user_id}}}, {"is_public": True}]})
-        user_courses = set()
-        for course in db.explorer.find({"user_id": user_id}):
-            user_courses.add(course["courseID"])
+        # Find all public courses not created by the user and not already in user's explorer
+        user_courses = set(course["courseID"] for course in db.explorer.find({"user_id": user_id}))
+        public_courses_cursor = db.explorer.find({
+            "user_id": {"$ne": user_id},
+            "is_public": True,
+            "courseID": {"$nin": list(user_courses)}
+        })
 
-        #print(courses)
-        course_list = []
+        public_course_ids = [course["courseID"] for course in public_courses_cursor]
 
-        if not courses:
-            print("No courses found for public explorer")
+        if not public_course_ids:
             return {"courses": []}, 200
-        for course in courses:
-            course_list.append(course["courseID"])
-        
-        course_list = list(set(course_list))
 
-        # Exclude courses that the user already has from the explorer list
-        course_list = [cid for cid in course_list if cid not in user_courses]
-
-        course_info = db.courses.find({"courseID": {"$in": course_list}})
+        course_info = db.courses.find({"courseID": {"$in": public_course_ids}})
         course_list = []
         for course in course_info:
             course_list.append({
