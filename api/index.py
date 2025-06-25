@@ -169,8 +169,13 @@ def getData():
                 "parent": course["parent"]
             })
         return {"courses": course_list}, 200
+    
+    
     elif mode == "coursegetexplorer":
         courses = db.explorer.find({ "$and": [ {"user_id":{"$not": {"$eq": user_id}}}, {"is_public": True}]})
+        user_courses = set()
+        for course in db.explorer.find({"user_id": user_id}):
+            user_courses.add(course["courseID"])
 
         #print(courses)
         course_list = []
@@ -182,6 +187,9 @@ def getData():
             course_list.append(course["courseID"])
         
         course_list = list(set(course_list))
+
+        # Exclude courses that the user already has from the explorer list
+        course_list = [cid for cid in course_list if cid not in user_courses]
 
         course_info = db.courses.find({"courseID": {"$in": course_list}})
         course_list = []
